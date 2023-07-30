@@ -8,7 +8,6 @@ const BlogCard = ({
     title,
     createdAt,
     authorName,
-    authorAvatar,
     cover,
     category,
     id,
@@ -16,8 +15,13 @@ const BlogCard = ({
 }) => {
   return (
     <div className="blogCard-wrap">
-      <img className="blogCard-cover" src={cover} alt="cover" />
-      <p className="chip">{category}</p>;<h3>{title}</h3>
+      <img
+        className="blogCard-cover"
+        src={`http://localhost:4000/images/${cover}`}
+        alt="cover"
+      />
+      <p className="chip">{category}</p>
+      <h3>{title}</h3>
       <p className="blogCard-desc">{description}</p>
       <footer>
         <div>

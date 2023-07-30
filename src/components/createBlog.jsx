@@ -1,15 +1,16 @@
 import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const BlogForm = () => {
   const [blog, setBlog] = useState({
-    id: 10,
+    id: "",
     title: "",
     category: "",
     subCategory: "",
     description: "",
     authorName: "",
-    cover: '/assets/images/designer-1.jpg',
-    createdAt: "June 03, 2021",
+    cover: null,
+    createdAt: new Date().toLocaleDateString(),
   });
 
   const handleChange = (e) => {
@@ -20,23 +21,26 @@ const BlogForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Ensure all fields are filled
     if (Object.values(blog).every((value) => value !== "")) {
+      // Generate a random unique ID for the blog
+      const randomId = uuidv4();
+      setBlog((prevBlog) => ({ ...prevBlog, id: randomId }));
+
       // Store the blog in local storage
       const blogs = JSON.parse(localStorage.getItem("blogs")) || [];
-      setBlog((prevBlog) => ({ ...prevBlog, id: prevBlog.id + 1 }));
       blogs.push(blog);
       localStorage.setItem("blogs", JSON.stringify(blogs));
+
       // Clear the form after submission
       setBlog({
-        id: blog.id + 1,
+        id: "",
         title: "",
         category: "",
         subCategory: "",
         description: "",
         authorName: "",
-        cover: '/assets/images/designer-1.jpg',
-        createdAt: "June 03, 2021",
+        cover: null,
+        createdAt: new Date().toLocaleDateString(),
       });
       alert("Blog successfully saved!");
     } else {
@@ -46,7 +50,10 @@ const BlogForm = () => {
 
   return (
     <form
-      onSubmit={handleSubmit}
+      action="http://localhost:4000/blog"
+      // onSubmit={handleSubmit}
+      method="post"
+      encType="multipart/form-data"
       style={{
         border: "5px solid #f1f1f1",
         borderRadius: "10px",
@@ -139,7 +146,7 @@ const BlogForm = () => {
           <input
             type="text"
             name="subCategory"
-            placeholder="Enter Subcategory (Optional)"
+            placeholder="Enter Subcategory seprated by comma (,)"
             value={blog.subCategory}
             onChange={handleChange}
             style={{
@@ -155,7 +162,7 @@ const BlogForm = () => {
           <br />
           <label
             htmlFor="description"
-            style={{ fontFamily: "Arial, sans-serif" }}
+            style={{ fontFamily: "Arial, sans-serif, " }}
           >
             <strong>Description</strong>
           </label>
@@ -202,7 +209,28 @@ const BlogForm = () => {
             }}
           />
           <br />
-          
+          <label htmlFor="cover" style={{ fontFamily: "Arial, sans-serif" }}>
+            <strong>Cover Image</strong>
+          </label>
+          <br />
+          {/* Input for image selection */}
+          <input
+            type="file"
+            name="cover"
+            accept="image/*"
+            onChange={handleChange}
+            style={{ margin: "8px 0" }}
+          />
+          <br />
+          {/* Display the chosen image (optional) */}
+          {blog.cover && (
+            <img
+              src={URL.createObjectURL(blog.cover)}
+              alt="Selected Cover"
+              style={{ width: "200px", height: "auto" }}
+            />
+          )}
+          <br />
         </div>
         <button
           type="submit"

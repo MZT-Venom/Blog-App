@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import EmptyList from '../components/emptyList';
-import SearchBar from '../components/searchBar';
-import Header from '../components/header';
-import BlogList from '../components/blogList';
-import { blogList } from '../data';
+import React, { useState, useEffect } from "react";
+import EmptyList from "../components/emptyList";
+import SearchBar from "../components/searchBar";
+import Header from "../components/header";
+import BlogList from "../components/blogList";
 
 const HomePage = () => {
   const [blogs, setBlogs] = useState([]);
-  const [searchKey, setSearchKey] = useState('');
+  const [searchKey, setSearchKey] = useState("");
 
-  // Fetch blogs from local storage and combine with existing blogs
   useEffect(() => {
-    const localStorageBlogs = JSON.parse(localStorage.getItem('blogs')) || [];
-    // Check if there are any missing fields in each blog and set default values
-    const combinedBlogs = localStorageBlogs.map((blog) => ({
-      ...blog,
-      subCategory: blog.subCategory || '',
-      createdAt: blog.createdAt || new Date().toISOString().substr(0, 10),
-    }));
-    setBlogs([...blogList, ...combinedBlogs]);
+    async function getData() {
+      try {
+        const response = await fetch("http://localhost:4000/getBlogs");
+        const data = await response.json();
+        setBlogs(data); // Update the blogs state with the fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    getData();
   }, []);
 
   // Search submit
@@ -29,8 +29,7 @@ const HomePage = () => {
 
   // Search for blog by category
   const handleSearchResults = () => {
-    const allBlogs = [...blogList, ...blogs];
-    const filteredBlogs = allBlogs.filter((blog) =>
+    const filteredBlogs = blogs.filter((blog) =>
       blog.category.toLowerCase().includes(searchKey.toLowerCase().trim())
     );
     setBlogs(filteredBlogs);
@@ -38,8 +37,7 @@ const HomePage = () => {
 
   // Clear search and show all blogs
   const handleClearSearch = () => {
-    setBlogs([...blogList, ...blogs]);
-    setSearchKey('');
+    setSearchKey("");
   };
 
   return (
